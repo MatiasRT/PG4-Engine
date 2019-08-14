@@ -1,0 +1,16 @@
+
+Engine/\.vs/
+
+Engine/Debug/
+
+Engine/Engine/Debug/
+
+Engine/EngineDLL/Debug/
+
+Engine/TestEngine/Debug/
+
+Engine/x64/Debug/
+
+Engine/TestEngine/x64/Debug/
+
+Engine/EngineDLL/x64/
