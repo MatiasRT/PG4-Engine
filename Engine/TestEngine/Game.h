@@ -24,10 +24,10 @@ class Game : public Gamebase {
 	Mesh * mesh;
 	Mesh * mesh2;
 
-	GameNode * sceneNode;
+	GameNode * scene;
 
-	GameNode * snFirstChild;
-	GameNode * snSecondChild;
+	GameNode * cameraNode;
+	GameNode * objects;
 
 	GameNode * rifle;
 	//GameNode * scSecondChild;
