@@ -47,9 +47,9 @@ void Camera::Walk(float xAxis, float zAxis) {
 	SetCamDef();
 	renderer->ModifyCamera(ViewMatrix);
 
-	cout <<"posx"<< pos.x << endl;
-	cout << "posy" << pos.y << endl;
-	cout << "posz" << pos.z << endl;
+	//cout <<"posx"<< pos.x << endl;
+	//cout << "posy" << pos.y << endl;
+	//cout << "posz" << pos.z << endl;
 }
 
 void Camera::Yaw(float xAxis) {
@@ -176,21 +176,21 @@ void Camera::AddBSP(Mesh * plane, glm::vec3 nodepos)
 	if (!plane->IsBSP())
 		return;
 
-	bspPlanes->push_back(GeneratePlane(nodepos, plane->GetForwardBSP()));
-	bspPlanesNormals->push_back(plane->GetForwardBSP());
+	bspPlanes->push_back(GeneratePlane(nodepos, plane->GetForwardBSP()));		// Me guardo en el vector de bsp los planos que genero
+	bspPlanesNormals->push_back(plane->GetForwardBSP());						// Me guardo en el vector de normales las normales de los planos
 }
 
 int Camera::BoxInBSP(Collider * collider)
 {
 	bool inTheSamePosition = false;
-	for (int i = 0; i < bspPlanes->size(); i++) {
-		float cameraDistanceToPlane = GetDistanceToPlane(pos, bspPlanes->at(i), bspPlanesNormals->at(i));
-		float cameraDistanceSign = glm::sign(cameraDistanceToPlane);
-		for (int j = 0; j < 8; j++)
+	for (int i = 0; i < bspPlanes->size(); i++) {								// Recorro todos los BSP
+		float cameraDistanceToPlane = GetDistanceToPlane(pos, bspPlanes->at(i), bspPlanesNormals->at(i));	// Obtengo la distancia de la camara al plano x
+		float cameraDistanceSign = glm::sign(cameraDistanceToPlane);										// Obtengo el signo para saber de que lado esta la camara
+		for (int j = 0; j < 8; j++)												// Recorro en 8 (cant de vertices en un cubo)
 		{
-			glm::vec3 vertexPosition = collider->GetVertices(j);
-			float vertexDistanceToPlane = GetDistanceToPlane(vertexPosition, bspPlanes->at(i), bspPlanesNormals->at(i));
-			float vertexDistanceSign = glm::sign(vertexDistanceToPlane);
+			glm::vec3 vertexPosition = collider->GetVertices(j);				// Obtengo los vertices
+			float vertexDistanceToPlane = GetDistanceToPlane(vertexPosition, bspPlanes->at(i), bspPlanesNormals->at(i));	// Obtengo la distancia de cada vertice del collider x al plano x.
+			float vertexDistanceSign = glm::sign(vertexDistanceToPlane);													// Obtengo el signo para saber de que lado esta.
 
 			if (vertexDistanceSign == cameraDistanceSign)
 				break;

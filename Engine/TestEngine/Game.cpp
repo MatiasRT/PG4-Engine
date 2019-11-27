@@ -116,6 +116,12 @@ bool Game::OnUpdate() {																			// Toda la logica va aca
 	return true;
 }
 
+void Game::OnDraw() {
+	cout << "Objectos en pantalla = " << renderer->objectsDraws << endl;
+	cout.clear();
+	renderer->objectsDraws = 0;
+}
+
 bool Game::OnStop() {
 	delete scene;
 	delete cameraNode;

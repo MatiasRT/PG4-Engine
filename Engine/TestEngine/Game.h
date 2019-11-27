@@ -43,5 +43,5 @@ protected:
 	bool OnStart() override;
 	bool OnStop() override;
 	bool OnUpdate() override;
-	void OnDraw() override { };
+	void OnDraw() override;
 };

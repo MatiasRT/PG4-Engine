@@ -185,7 +185,7 @@ bool Importer::IsBSPNode(const aiMesh* paiMesh, GameNode* node, Mesh* meshCompon
 	string meshName = paiMesh->mName.C_Str();
 	if (meshName.compare(0, 5, "Plane") == 0) {
 		meshComponent->SetBSP(true, node);
-		cout << "isbsp" << endl;
+		//cout << "isbsp" << endl;
 		return true;
 	}
 	return false;

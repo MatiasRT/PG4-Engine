@@ -30,7 +30,7 @@ void Gamebase::Loop() {
 		OnUpdate();
 
 		renderer->ClearScreen();
-		//OnDraw();
+		OnDraw();
 		if (sceneNode)
 			sceneNode->Draw();
 

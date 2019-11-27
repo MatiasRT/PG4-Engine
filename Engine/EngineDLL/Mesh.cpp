@@ -87,7 +87,7 @@ void Mesh::Draw() {
 		if(!isBSP)
 			renderer->objectsDraws++;
 
-		cout << "Mesh Inside Frustum" << endl;
+		//cout << "Mesh Inside Frustum" << endl;
 		if (meshInfo->material != NULL) {
 			meshInfo->material->Bind();
 			meshInfo->material->SetMatrixProperty(renderer->GetWVP());
@@ -101,8 +101,8 @@ void Mesh::Draw() {
 		renderer->EndDraw(0);																				// Deja de dibujar
 		renderer->EndDraw(1);
 	}
-	else
-		cout << "Mesh Outside Frustum" << endl;
+	//else
+		//cout << "Mesh Outside Frustum" << endl;
 }
 
 void Mesh::DisposeVertices() {
@@ -126,7 +126,7 @@ void Mesh::DisposeTexture() {
 	}
 }
 
-void Mesh::UpdateData(glm::vec3 min, glm::vec3 max){
+void Mesh::UpdateData(glm::vec3 min, glm::vec3 max){		// Updateo los 8 vertices asi no se rompe el collider
 	//glm::vec3 auxVec = collider->GetVertices(0);
 	glm::vec3 auxVec;
 	auxVec.x = max.x; 
