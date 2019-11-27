@@ -29,6 +29,9 @@ class Game : public Gamebase {
 	GameNode * cameraNode;
 	GameNode * objects;
 
+	GameNode * wall1;
+	GameNode * wall2;
+
 	GameNode * rifle;
 	//GameNode * scSecondChild;
 

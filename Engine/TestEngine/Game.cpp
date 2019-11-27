@@ -22,6 +22,9 @@ bool Game::OnStart() {
 	scene = new GameNode(renderer);															// Creo el Nodo Padre que va a contener todo
 	cameraNode = new GameNode(renderer);														// Creo un Nodo hijo del Nodo Padre
 	objects = new GameNode(renderer);														// Creo un Nodo hijo del Nodo Padre
+
+	wall1 = new GameNode(renderer);
+	wall2 = new GameNode(renderer);
 	
 	rifle = new GameNode(renderer);														// Creo un Nodo hijo del Segundo hijo del Nodo Padre
 	//scSecondChild = new GameNode(renderer);														// Creo un Nodo hijo del Segundo hijo del Nodo Padre
@@ -34,10 +37,16 @@ bool Game::OnStart() {
 	cameraNode->AddComponent(camera);															// Le agrego un componente de camara al primer hijo del Nodo Padre
 
 	//Importer::LoadMesh("glock.fbx", "glock.bmp", scFirstChild, renderer, camera);				// Cargo el modelo
-	Importer::LoadMesh("sceneDefault.fbx", "Sample2.bmp", objects, renderer, camera);				// Cargo el modelo
+	Importer::LoadMesh("BSPFinal.fbx", "pastote.bmp", objects, renderer, camera);				// Cargo el modelo
 	camera->SetPos(0.0f, 0.0f, -10.0f);
 
-	rifle = objects->GetNode(3);
+	rifle = objects->GetNode(10);
+
+	wall1 = objects->GetNode(5);
+	wall2 = objects->GetNode(4);
+
+	wall1->SetPos(10000, -50000, 0);
+	wall2->SetPos(10000, -50000, 0);
 
 	//snSecondChild->SetScale(0.001f, 0.001f, 0.001f);
 
@@ -66,6 +75,7 @@ bool Game::OnUpdate() {																			// Toda la logica va aca
 	//scFirstChild->GetNode(5)->Rotate(-time, 0, 0);												// Rotacion de bala n2
 	//scFirstChild->GetNode(6)->Rotate(0, 0, time);												// Rotacion de bala n3
 
+	//cout << "" << endl;
 
 	/* MOVIMIENTO CAMARA */
 	if (input->GetInput(GLFW_KEY_W))
@@ -79,17 +89,17 @@ bool Game::OnUpdate() {																			// Toda la logica va aca
 
 	/* ROTACION CAMARA */
 	if (input->GetInput(GLFW_KEY_UP))
-		camera->Pitch(-0.01f);
+		camera->Pitch(-0.05f);
 	if (input->GetInput(GLFW_KEY_DOWN))
-		camera->Pitch(0.01f);
+		camera->Pitch(0.05f);
 	if (input->GetInput(GLFW_KEY_LEFT))
-		camera->Yaw(0.01f);
+		camera->Yaw(0.05f);
 	if (input->GetInput(GLFW_KEY_RIGHT))
-		camera->Yaw(-0.01f);
+		camera->Yaw(-0.05f);
 	if (input->GetInput(GLFW_KEY_Q))
-		camera->Roll(-0.01f);
+		camera->Roll(-0.05f);
 	if (input->GetInput(GLFW_KEY_E))
-		camera->Roll(0.01f);
+		camera->Roll(0.05f);
 
 	/* SPRINT */
 	if (input->GetInput(GLFW_KEY_LEFT_SHIFT))
@@ -98,10 +108,10 @@ bool Game::OnUpdate() {																			// Toda la logica va aca
 
 	/* RIFLE */
 	if (input->GetInput(GLFW_KEY_Z))
-		rifle->TranslationBox(speed * time, 0, 0);
+		rifle->TranslationBox(0, 0,speed * time);
 
 	if (input->GetInput(GLFW_KEY_C))
-		rifle->TranslationBox(speed * time * -1, 0, 0);
+		rifle->TranslationBox(0, 0,speed * time * -1);
 
 	return true;
 }

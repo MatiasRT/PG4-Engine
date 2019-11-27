@@ -13,7 +13,7 @@ Camera::Camera(Renderer * render) : Component(renderer){
 	forward = glm::vec4(0, 0, 1, 0);	//	z
 
 	//pos = glm::vec4(0, 0, 0, 1);
-	pos = glm::vec4(0, 0, -50, 1);
+	pos = glm::vec4(400, 65, 17, 1);
 
 	renderer = render;
 	ViewMatrix = glm::lookAt(
@@ -46,6 +46,10 @@ void Camera::Walk(float xAxis, float zAxis) {
 
 	SetCamDef();
 	renderer->ModifyCamera(ViewMatrix);
+
+	cout <<"posx"<< pos.x << endl;
+	cout << "posy" << pos.y << endl;
+	cout << "posz" << pos.z << endl;
 }
 
 void Camera::Yaw(float xAxis) {
