@@ -2,7 +2,8 @@
 
 GameNode::GameNode(Renderer * render) : Entity(render) {
 	renderer = render;
-	worldMatrix = renderer->GetViewMatrix();
+	//worldMatrix = renderer->GetViewMatrix();
+	worldMatrix = renderer->GetWorldMatrix();
 	nodes = new vector<GameNode*>();
 	components = new vector<Component*>();
 }
@@ -77,6 +78,11 @@ GameNode * GameNode::GetNode(int index) {
 		return nodes->at(nodes->size() - 1);
 	return nodes->at(index);
 }
+
+/*GameNode * GameNode::GetPlayer()
+{
+	return nullptr;
+}*/
 
 Component * GameNode::GetComponent(ComponentsType type) {
 	for (size_t i = 0; i < components->size(); i++) {

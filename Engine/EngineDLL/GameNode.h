@@ -17,6 +17,8 @@ public:
 	GameNode(Renderer * render);
 	~GameNode() { };
 
+	string name = "";
+
 	void Update();
 	void Draw();
 
@@ -29,6 +31,7 @@ public:
 	vector<GameNode*>* GetChilds();
 
 	GameNode * GetNode(int index);
+	//GameNode * GetPlayer();
 	Component* GetComponent(ComponentsType type);
 };
 #endif

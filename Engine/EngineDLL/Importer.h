@@ -4,7 +4,6 @@
 #include "Exports.h"
 #include "Definitions.h"
 #include "GameNode.h"
-#include "Camera.h"
 #include <fstream>
 #include <vector>
 #include "assimp/Importer.hpp"
@@ -13,6 +12,7 @@
 #include "assimp/postprocess.h"
 
 class Mesh;
+class Camera;
 
 struct Header {
 	unsigned int dataPos;
@@ -23,7 +23,13 @@ struct Header {
 
 static class ENGINEDLL_API Importer {
 	
-	static void InitMesh(const aiMesh* paiMesh, Mesh* mesh, glm::vec3 &minimumPoints, glm::vec3 &maximusPoints);
+	/* BMP */
+	static bool BMPCorrectFormat(unsigned char header[], FILE * bmpFile);
+	static void SetNodeTransform(aiNode* aiNode, GameNode* node);
+	static bool IsBSPNode(const aiMesh* paiMesh, GameNode* node, Mesh* meshComponent);
+
+	/* MESH */
+	static void InitMesh(const aiMesh* paiMesh, Mesh* mesh, Mesh* child, glm::vec3 &minimumPoints, glm::vec3 &maximusPoints, aiNode* node);
 	static void ProcessNodes(const char* txtFile, GameNode* father, 
 		aiNode* node, const aiScene* scene, Renderer* renderer,
 		glm::vec3 &minimumPoints, glm::vec3 &maximusPoints, Camera * cam);

@@ -38,6 +38,11 @@ class ENGINEDLL_API Mesh : public Component {
 	void DisposeVertices();
 	void DisposeIndices();
 	void DisposeTexture();
+
+	/* BSP */
+	bool isBSP = false;
+	glm::vec3 bspVecForward;
+
 public:
 	Mesh(Renderer* renderer, const char* txtFile, Camera * cam);
 	~Mesh();
@@ -47,5 +52,11 @@ public:
 	
 	MeshData* GetMeshData() { return meshData; };
 	Collider* collider;
+
+	/* BSP */
+	void UpdateData(glm::vec3 min, glm::vec3 max);
+	void SetBSP(bool bsp, GameNode * node);
+	bool IsBSP() { return isBSP; }
+	glm::vec3 GetForwardBSP() { return bspVecForward; }
 };
 #endif

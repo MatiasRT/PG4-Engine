@@ -67,4 +67,6 @@ public:
 	glm::mat4 GetProjectionMatrix() { return ProjectionMatrix; };
 
 	void BindBuffer(unsigned int atribID, unsigned int vtxBuffer, unsigned int size);
+
+	int objectsDraws = 0;
 };

@@ -3,6 +3,7 @@
 #define GL_TRIANGLES			0x0004
 #define GL_TRIANGLE_STRIP		0x0005
 #define GL_TRIANGLE_FAN			0x0006
+#define FULL_ROTATION			360.0f
 
 enum Layers {
 	Player_layer = 0,

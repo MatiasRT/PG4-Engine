@@ -40,7 +40,13 @@ public:
 	glm::vec3 GetPos() { return v3pos; };
 	glm::vec3 GetScale() { return v3scale; };
 	glm::vec3 GetRot() { return v3rot; };
+	glm::mat4 GetRotMatrix() { return rotMatrix; };
 	BoundingBox* GetBoundingBox() { return box; };
 	BoundingCircle* GetBoundingCircle() { return circle; };
 	void UpdateWorldMatrix();
+
+	/* BSP */
+	void SetRotationMatrix(float x, float y, float z, float w);
+	void ConvertToEulerAngles(const glm::vec4 & quaternion, float & pitch, float & yaw, float & roll);
+	void ClampEulerRotation();
 };

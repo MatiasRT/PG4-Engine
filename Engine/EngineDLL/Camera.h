@@ -7,6 +7,7 @@
 #include "Renderer.h"
 #include "Component.h"
 #include "Collider.h"
+#include "Mesh.h"
 
 /****************************************************************/
 /* ESTE CODIGO FUE HECHO EN BASE A ESTA PAGINA					*/
@@ -36,6 +37,10 @@ class ENGINEDLL_API Camera : public Component {
 	glm::vec4 up;
 	glm::vec4 pos;
 
+	/* BSP */
+	vector<glm::vec4> * bspPlanes;
+	vector<glm::vec3> * bspPlanesNormals;
+
 	glm::vec4 plane[Count];
 
 	float nearDistance;
@@ -60,4 +65,10 @@ public:
 	void SetCamDef();
 	glm::vec4 GeneratePlane(glm::vec3 normal, glm::vec3 point);
 	int BoxInFrustum(Collider * BundingCube);
+
+	/* BSP */
+	void AddBSP(Mesh * plane, glm::vec3 nodePos);
+	int BoxInBSP(Collider * collider);
+
+	float GetDistanceToPlane(glm::vec3 point, glm::vec4 plane, glm::vec3 planeNormal);
 };

@@ -13,6 +13,8 @@ public:
 	~Collider() { };
 
 	glm::vec3 GetVertices(int index);
+	float * GetVertives();
 	void SetVertices(glm::vec3 col[8]);
+	void SetVertices(int index, glm::vec3 pos);
 };
 #endif

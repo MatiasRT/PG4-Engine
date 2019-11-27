@@ -4,7 +4,7 @@ bool Game::OnStart() {
 	i = 0;
 	translation = 0;
 	rotation = 0;
-	speed = 0;
+	speed = 20.0f;
 
 	camera = new Camera(renderer);
 	Input* input = Input::Instance();
@@ -22,24 +22,30 @@ bool Game::OnStart() {
 	sceneNode = new GameNode(renderer);															// Creo el Nodo Padre que va a contener todo
 	snFirstChild = new GameNode(renderer);														// Creo un Nodo hijo del Nodo Padre
 	snSecondChild = new GameNode(renderer);														// Creo un Nodo hijo del Nodo Padre
-	scFirstChild = new GameNode(renderer);														// Creo un Nodo hijo del Segundo hijo del Nodo Padre
-	scSecondChild = new GameNode(renderer);														// Creo un Nodo hijo del Segundo hijo del Nodo Padre
+	
+	rifle = new GameNode(renderer);														// Creo un Nodo hijo del Segundo hijo del Nodo Padre
+	//scSecondChild = new GameNode(renderer);														// Creo un Nodo hijo del Segundo hijo del Nodo Padre
 
 	sceneNode->AddChild(snFirstChild);															// Le agrego un hijo al Nodo Padre
 	sceneNode->AddChild(snSecondChild);															// Le agrego un hijo al Nodo Padre
-	snSecondChild->AddChild(scFirstChild);														// Le agrego un hijo al segundo hijo del Nodo Padre
-	snSecondChild->AddChild(scSecondChild);														// Le agrego un hijo al segundo hijo del Nodo Padre
+	//snSecondChild->AddChild(scFirstChild);														// Le agrego un hijo al segundo hijo del Nodo Padre
+	//snSecondChild->AddChild(scSecondChild);														// Le agrego un hijo al segundo hijo del Nodo Padre
 
 	snFirstChild->AddComponent(camera);															// Le agrego un componente de camara al primer hijo del Nodo Padre
 
-	Importer::LoadMesh("glock.fbx", "glock.bmp", scFirstChild, renderer, camera);				// Cargo el modelo
-	Importer::LoadMesh("sword.fbx", "sword.bmp", scSecondChild, renderer, camera);				// Cargo el modelo
-	
-	scFirstChild->SetScale(0.5f, 0.5f, 0.5f);
-	scFirstChild->SetPos(0.0f, 0.0f, 20.0f);
+	//Importer::LoadMesh("glock.fbx", "glock.bmp", scFirstChild, renderer, camera);				// Cargo el modelo
+	Importer::LoadMesh("sceneDefault.fbx", "Sample2.bmp", snSecondChild, renderer, camera);				// Cargo el modelo
+	camera->SetPos(0.0f, 0.0f, -10.0f);
 
-	scSecondChild->SetPos(4.0f, 0.0f, 60.0f);
-	scSecondChild->Rotate(0.0f, 2.0f, 0.0f);
+	rifle = snSecondChild->GetNode(3);
+
+	//snSecondChild->SetScale(0.001f, 0.001f, 0.001f);
+
+	//scFirstChild->SetScale(0.5f, 0.5f, 0.5f);
+	//scFirstChild->SetPos(0.0f, 0.0f, 20.0f);
+
+	//scSecondChild->SetPos(4.0f, 0.0f, 60.0f);
+	//scSecondChild->Rotate(0.0f, 2.0f, 0.0f);
 
 	SetSceneNode(sceneNode);																	// Seteo que es el Nodo Padre
 
@@ -51,25 +57,25 @@ bool Game::OnUpdate() {																			// Toda la logica va aca
 	Input* input = Input::Instance();
 	//CollisionManager::Instance()->BoxCollisionDetector();
 	input->PollEvents();
-	speed = 0.2f;
+	//speed = 20.0f;
 
 	/* NODOS */
-	scFirstChild->Rotate(0, time * speed, 0);													// Rotacion de todo el modelo de la pistola con las balas y el cargador
-	scFirstChild->GetNode(3)->Rotate(time, 0, 0);												// Rotacion del cargador
-	scFirstChild->GetNode(4)->Rotate(time, 0, 0);												// Rotacion de bala n1
-	scFirstChild->GetNode(5)->Rotate(-time, 0, 0);												// Rotacion de bala n2
-	scFirstChild->GetNode(6)->Rotate(0, 0, time);												// Rotacion de bala n3
+	//scFirstChild->Rotate(0, time * speed, 0);													// Rotacion de todo el modelo de la pistola con las balas y el cargador
+	//scFirstChild->GetNode(3)->Rotate(time, 0, 0);												// Rotacion del cargador
+	//scFirstChild->GetNode(4)->Rotate(time, 0, 0);												// Rotacion de bala n1
+	//scFirstChild->GetNode(5)->Rotate(-time, 0, 0);												// Rotacion de bala n2
+	//scFirstChild->GetNode(6)->Rotate(0, 0, time);												// Rotacion de bala n3
 
 
 	/* MOVIMIENTO CAMARA */
 	if (input->GetInput(GLFW_KEY_W))
-		camera->Walk(0, 0.1f);
+		camera->Walk(0, 0.1f * speed * time);
 	if (input->GetInput(GLFW_KEY_S))
-		camera->Walk(0, -0.1f);
+		camera->Walk(0, -0.1f * speed * time);
 	if (input->GetInput(GLFW_KEY_A))
-		camera->Walk(0.4f, 0);
+		camera->Walk(0.4f * speed * time * 0.5f, 0);
 	if (input->GetInput(GLFW_KEY_D))
-		camera->Walk(-0.4f, 0);								
+		camera->Walk(-0.4f * speed * time * 0.5f, 0);
 
 	/* ROTACION CAMARA */
 	if (input->GetInput(GLFW_KEY_UP))
@@ -85,6 +91,10 @@ bool Game::OnUpdate() {																			// Toda la logica va aca
 	if (input->GetInput(GLFW_KEY_E))
 		camera->Roll(0.01f);
 
+	if (input->GetInput(GLFW_KEY_LEFT_SHIFT))
+		speed = 200.0f;
+	else speed = 20.0f;
+
 
 	return true;
 }
@@ -93,8 +103,8 @@ bool Game::OnStop() {
 	delete sceneNode;
 	delete snFirstChild;
 	delete snSecondChild;
-	delete scFirstChild;
-	delete scSecondChild;
+	//delete scFirstChild;
+	//delete scSecondChild;
 
 	delete camera;
 	cout << "Game::OnStop()" << endl;

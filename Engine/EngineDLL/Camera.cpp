@@ -8,11 +8,12 @@
 Camera::Camera(Renderer * render) : Component(renderer){
 	type: ComponentsType::CamerasType;
 
-	forward = glm::vec4(0, 0, 1, 0);
-	right = glm::vec4(1, 0, 0, 0);
-	up = glm::vec4(0, 1, 0, 0);
+	right = glm::vec4(1, 0, 0, 0);		//	x
+	up = glm::vec4(0, 1, 0, 0);			//	y
+	forward = glm::vec4(0, 0, 1, 0);	//	z
 
-	pos = glm::vec4(0, 0, 0, 1);
+	//pos = glm::vec4(0, 0, 0, 1);
+	pos = glm::vec4(0, 0, -50, 1);
 
 	renderer = render;
 	ViewMatrix = glm::lookAt(
@@ -29,6 +30,9 @@ Camera::Camera(Renderer * render) : Component(renderer){
 	SetCamInternals();
 	SetCamDef();
 	renderer->SetViewMatrix(ViewMatrix);
+
+	bspPlanes = new vector<glm::vec4>();
+	bspPlanesNormals = new vector<glm::vec3>();
 }
 
 void Camera::Walk(float xAxis, float zAxis) {
@@ -161,4 +165,46 @@ int Camera::BoxInFrustum(Collider * collider) {
 		return CameraStates::In;												// Esta adentro del frustum
 	else
 		return CameraStates::Out;												// Esta afuera del frustum
+}
+
+void Camera::AddBSP(Mesh * plane, glm::vec3 nodepos)
+{
+	if (!plane->IsBSP())
+		return;
+
+	bspPlanes->push_back(GeneratePlane(nodepos, plane->GetForwardBSP()));
+	bspPlanesNormals->push_back(plane->GetForwardBSP());
+}
+
+int Camera::BoxInBSP(Collider * collider)
+{
+	bool inTheSamePosition = false;
+	for (int i = 0; i < bspPlanes->size(); i++) {
+		float cameraDistanceToPlane = GetDistanceToPlane(pos, bspPlanes->at(i), bspPlanesNormals->at(i));
+		float cameraDistanceSign = glm::sign(cameraDistanceToPlane);
+		for (int j = 0; j < 8; j++)
+		{
+			glm::vec3 vertexPosition = collider->GetVertices(j);
+			float vertexDistanceToPlane = GetDistanceToPlane(vertexPosition, bspPlanes->at(i), bspPlanesNormals->at(i));
+			float vertexDistanceSign = glm::sign(vertexDistanceToPlane);
+
+			if (vertexDistanceSign == cameraDistanceSign)
+				break;
+			if (j == 8 -1)
+				inTheSamePosition = true;
+		}
+	}
+	if (!inTheSamePosition)
+		return CameraStates::In;
+	else
+		return CameraStates::Out;
+}
+
+float Camera::GetDistanceToPlane(glm::vec3 point, glm::vec4 plane, glm::vec3 planeNormal)
+{
+	float distance = 0.0f;
+
+	distance = glm::dot(planeNormal, point) + plane.w;
+
+	return distance;
 }

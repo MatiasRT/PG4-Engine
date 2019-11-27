@@ -71,7 +71,22 @@ void Mesh::SetMeshData(MeshData * meshD) {
 }
 
 void Mesh::Draw() {
-	if (camera->BoxInFrustum(collider) == CameraStates::In) {
+
+	bool shouldDraw = true;
+
+	if(!isBSP){
+		if(camera->BoxInBSP(collider) != CameraStates::In)
+			shouldDraw = false;
+		if (camera->BoxInFrustum(collider) != CameraStates::In)
+			shouldDraw = false;
+	}
+
+	//if (camera->BoxInFrustum(collider) == CameraStates::In) {
+	if (shouldDraw) {
+
+		if(!isBSP)
+			renderer->objectsDraws++;
+
 		cout << "Mesh Inside Frustum" << endl;
 		if (meshInfo->material != NULL) {
 			meshInfo->material->Bind();
@@ -109,4 +124,65 @@ void Mesh::DisposeTexture() {
 		renderer->DestroyBuffer(meshInfo->textureBufferId);
 		meshInfo->shouldDisposeTexture = false;
 	}
+}
+
+void Mesh::UpdateData(glm::vec3 min, glm::vec3 max){
+	//glm::vec3 auxVec = collider->GetVertices(0);
+	glm::vec3 auxVec;
+	auxVec.x = max.x; 
+	auxVec.y = max.y;
+	auxVec.z = max.z;
+	collider->SetVertices(0, auxVec);
+
+	//auxVec = collider->GetVertices(1);
+	auxVec.x = max.x;
+	auxVec.y = max.y;
+	auxVec.z = min.z;
+	collider->SetVertices(1, auxVec);
+
+	//auxVec = collider->GetVertices(2);
+	auxVec.x = min.x;
+	auxVec.y = max.y;
+	auxVec.z = max.z;
+	collider->SetVertices(2, auxVec);
+
+	//auxVec = collider->GetVertices(3);
+	auxVec.x = min.x;
+	auxVec.y = max.y;
+	auxVec.z = min.z;
+	collider->SetVertices(3, auxVec);
+
+	//auxVec = collider->GetVertices(4);
+	auxVec.x = max.x;
+	auxVec.y = min.y;
+	auxVec.z = max.z;
+	collider->SetVertices(4, auxVec);
+
+	//auxVec = collider->GetVertices(5);
+	auxVec.x = max.x;
+	auxVec.y = min.y;
+	auxVec.z = min.z;
+	collider->SetVertices(5, auxVec);
+
+	//auxVec = collider->GetVertices(6);
+	auxVec.x = min.x;
+	auxVec.y = min.y;
+	auxVec.z = max.z;
+	collider->SetVertices(6, auxVec);
+
+	//auxVec = collider->GetVertices(7);
+	auxVec.x = min.x;
+	auxVec.y = min.y;
+	auxVec.z = min.z;
+	collider->SetVertices(7, auxVec);
+}
+
+void Mesh::SetBSP(bool bsp, GameNode * node){
+	if (!bsp)
+		return;
+
+	isBSP = bsp;
+	bspVecForward = glm::normalize((glm::vec3)(node->GetRotMatrix() * glm::vec4(0.0f,0.0f,1.0f,0.0f)));
+
+	camera->AddBSP(this, node->GetPos());
 }

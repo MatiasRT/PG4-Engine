@@ -3,7 +3,7 @@
 
 Header Importer::LoadBMP(const char * name) {
 
-	// Lectura de información del encabezado del archivo
+	// Lectura de informaciï¿½n del encabezado del archivo
 	unsigned char header[54]; // Each BMP file begins by a 54-bytes header
 	FILE * file;
 	fopen_s(&file, name, "rb");
@@ -17,19 +17,19 @@ Header Importer::LoadBMP(const char * name) {
 		h.height = *(int*)&(header[0x16]);
 	}
 
-	// Algunos archivos BMP tienen un mal formato, así que adivinamos la información faltante
+	// Algunos archivos BMP tienen un mal formato, asï¿½ que adivinamos la informaciï¿½n faltante
 	if (h.imageSize == 0)    
 		h.imageSize = h.width * h.height * 3;	// 3 : un byte por cada componente Rojo (Red), Verde (Green) y Azul(Blue)
 	if (h.dataPos == 0)      
-		h.dataPos = 54;						// El encabezado del BMP está hecho de ésta manera
+		h.dataPos = 54;						// El encabezado del BMP estï¿½ hecho de ï¿½sta manera
 
 	// Se crea un buffer
 	h.data = new unsigned char[h.imageSize];
 
-	// Leemos la información del archivo y la ponemos en el buffer
+	// Leemos la informaciï¿½n del archivo y la ponemos en el buffer
 	fread(h.data, 1, h.imageSize, file);
 
-	//Todo está en memoria ahora, así que podemos cerrar el archivo
+	//Todo estï¿½ en memoria ahora, asï¿½ que podemos cerrar el archivo
 	fclose(file);
 
 	return h;
@@ -61,16 +61,20 @@ void Importer::LoadMesh(const char * fbxFile, const char * txtFile, GameNode * f
 	// And have it read the given file with some example postprocessing
 	// Usually - if speed is not the most important aspect for you - you'll 
 	// propably to request more postprocessing than we do in this example.
-	const aiScene* pScene = importer.ReadFile(fbxFile, ASSIMP_LOAD_FLAGS);
+	const aiScene* pScene = importer.ReadFile(fbxFile, 
+		aiProcess_CalcTangentSpace |
+		aiProcess_Triangulate |
+		aiProcess_JoinIdenticalVertices |
+		aiProcess_SortByPType);
 
 	if (!pScene) 
 		printf("Error parsing '%s': '%s'\n", fbxFile, importer.GetErrorString());
 	
-	glm::vec3 minimumPoints = glm::vec3(0, 0, 0);																	// Creo un vec donde se guardan los puntos minimos del collider que va a contener el mesh
-	glm::vec3 maximusPoints = glm::vec3(0, 0, 0);																	// Creo un vec donde se guardan los puntos maximos del collider que va a contener el mesh
+	glm::vec3 minimumPoints = glm::vec3(INT_MAX, INT_MAX, INT_MAX);																	// Creo un vec donde se guardan los puntos minimos del collider que va a contener el mesh
+	glm::vec3 maximusPoints = glm::vec3(INT_MIN, INT_MIN, INT_MIN);																	// Creo un vec donde se guardan los puntos maximos del collider que va a contener el mesh
 
 	ProcessNodes(txtFile, father, pScene->mRootNode, pScene, renderer, minimumPoints, maximusPoints, cam);			// Creo y proceso los nodos
-	CreateColliderVertices(father, minimumPoints, maximusPoints);													// Creo los vertices de los modelos para obtener el collider
+	//CreateColliderVertices(father, minimumPoints, maximusPoints);													// Creo los vertices de los modelos para obtener el collider
 	
 }
 
@@ -80,17 +84,20 @@ void Importer::ProcessNodes(const char * txtFile, GameNode* father, aiNode* node
 	for (int i = 0; i < (int)node->mNumMeshes; i++) {																// Este loop esta determinado segun la cantidad de meshes que tiene el nodo de la escena
 
 		Mesh * mesh = new Mesh(renderer, txtFile, cam);																// Creo un mesh
-		InitMesh(scene->mMeshes[node->mMeshes[i]], mesh, minimumPoints, maximusPoints);								// Genero los vectores del mesh en InitMesh
+		//InitMesh(scene->mMeshes[node->mMeshes[i]], mesh, minimumPoints, maximusPoints);								// Genero los vectores del mesh en InitMesh
 		GameNode * child = new GameNode(renderer);																	// Creo un nodo
 		child->AddComponent((Component*)mesh);																		// Le agrego al nodo el mesh creado arriba como componente
+		InitMesh(scene->mMeshes[node->mMeshes[i]], mesh, (Mesh*)child->GetComponent(ComponentsType::MeshType), minimumPoints, maximusPoints, node);
 		father->AddChild(child);																					// El nodo creado pasa a ser hijo del nodo padre pasado por parametro
+		SetNodeTransform(node, child);
+		IsBSPNode(scene->mMeshes[node->mMeshes[i]], child, mesh);
 	}
 
 	for (int i = 0; i < (int)node->mNumChildren; i++)																// Este loop esta determinado segun la cantidad de meshes que tiene el nodo de la escena
 		ProcessNodes(txtFile, father, node->mChildren[i], scene, renderer, minimumPoints, maximusPoints, cam);		// Hacemos recursividad sobre esta funcion para que se repita esto para todos los posibles meshes que tenga como hijos el modelo exportado
 }
 
-void Importer::InitMesh(const aiMesh* paiMesh, Mesh * mesh, glm::vec3 &minimumPoints, glm::vec3 &maximusPoints) {
+void Importer::InitMesh(const aiMesh* paiMesh, Mesh* mesh, Mesh* child, glm::vec3 &minimumPoints, glm::vec3 &maximusPoints, aiNode* node) {
 	MeshData * meshD = mesh->GetMeshData();																			// Obtengo la estructura de meshData e inicializop los vectores
 	meshD->vertices = new std::vector<float>();													
 	meshD->textures = new std::vector<float>();
@@ -117,6 +124,8 @@ void Importer::InitMesh(const aiMesh* paiMesh, Mesh * mesh, glm::vec3 &minimumPo
 		if (pPos->z > maximusPoints.z)
 			maximusPoints.z = pPos->z;		// Maximo en z
 
+		mesh->UpdateData(minimumPoints, maximusPoints);
+
 		meshD->vertices->push_back(pPos->x);																		// Cargo el vector de vertices con los vertices del mesh
 		meshD->vertices->push_back(pPos->y);
 		meshD->vertices->push_back(pPos->z);
@@ -125,6 +134,8 @@ void Importer::InitMesh(const aiMesh* paiMesh, Mesh * mesh, glm::vec3 &minimumPo
 		meshD->textures->push_back(pTexCoord->y);
 
 	}
+
+	//child->UpdateData(minimumPoints, maximusPoints);
 
 	for (unsigned int i = 0; i < paiMesh->mNumFaces; i++) {
 		const aiFace& Face = paiMesh->mFaces[i];
@@ -138,7 +149,7 @@ void Importer::InitMesh(const aiMesh* paiMesh, Mesh * mesh, glm::vec3 &minimumPo
 }
 
 void Importer::CreateColliderVertices(GameNode * father, glm::vec3 minimumPoints, glm::vec3 maximusPoints) {
-	const int vertices = 8;
+	/*const int vertices = 8;
 	glm::vec3 colVertices[vertices] = {																				// Guardo en este vector los vertices del collider
 		glm::vec3(minimumPoints.x, minimumPoints.y, minimumPoints.z),												
 		glm::vec3(maximusPoints.x, maximusPoints.y, maximusPoints.z),												
@@ -155,4 +166,27 @@ void Importer::CreateColliderVertices(GameNode * father, glm::vec3 minimumPoints
 
 	if (father->GetNode(0)->GetComponent(ComponentsType::MeshType) != nullptr)										// Pregunto si tiene mesh antes de asignarlo
 		((Mesh*)father->GetNode(0)->GetComponent(ComponentsType::MeshType))->collider->SetVertices(colVertices);	// Le asigo el collider al mesh
+		*/
+}
+
+void Importer::SetNodeTransform(aiNode* aiNode, GameNode* node){
+	aiVector3D aiScaling;
+	aiVector3D aiPosition;
+	aiQuaternion aiRotation;
+
+	aiNode->mTransformation.Decompose(aiScaling, aiRotation, aiPosition);
+
+	node->SetRotationMatrix(aiRotation.x, aiRotation.y, aiRotation.z, aiRotation.w);
+	node->SetPos(aiPosition.x, aiPosition.y, aiPosition.z);
+	node->SetScale(aiScaling.x, aiScaling.y, aiScaling.z);
+}
+
+bool Importer::IsBSPNode(const aiMesh* paiMesh, GameNode* node, Mesh* meshComponent){
+	string meshName = paiMesh->mName.C_Str();
+	if (meshName.compare(0, 5, "Plane") == 0) {
+		meshComponent->SetBSP(true, node);
+		cout << "isbsp" << endl;
+		return true;
+	}
+	return false;
 }

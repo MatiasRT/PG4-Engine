@@ -145,3 +145,65 @@ void Entity::SetBoundingCircle(float r, float mass, bool setStatic, bool setTrig
 void Entity::UpdateWorldMatrix() {
 	worldMatrix = translateMatrix * rotMatrix * scaleMatrix;								// Multiplico las matrices luego de hacerles transformaciones
 }
+
+void Entity::SetRotationMatrix(float x, float y, float z, float w)
+{
+	float pitch, yaw, roll;
+
+	glm::vec4 quaternion = glm::normalize(glm::vec4(x,y,z,w));
+
+	ConvertToEulerAngles(quaternion, pitch, yaw, roll);
+
+	v3rot = glm::vec3(pitch, yaw, roll);
+
+	glm::mat4 mat1 = glm::mat4
+	{
+		quaternion.w, quaternion.z, -quaternion.y, quaternion.x,
+		-quaternion.z, quaternion.w, quaternion.x, quaternion.y,
+		quaternion.y, -quaternion.x, quaternion.w, quaternion.z,
+		-quaternion.x, -quaternion.y, -quaternion.z, quaternion.w
+	};
+
+	glm::mat4 mat2 = glm::mat4
+	{
+		quaternion.w, quaternion.z, -quaternion.y, -quaternion.x,
+		-quaternion.z, quaternion.w, quaternion.x, -quaternion.y,
+		quaternion.y, -quaternion.x, quaternion.w, -quaternion.z,
+		quaternion.x, quaternion.y, quaternion.z, quaternion.w
+	};
+
+	rotMatrix = mat1 * mat2;
+
+	ClampEulerRotation();
+	UpdateWorldMatrix();
+}
+
+void Entity::ConvertToEulerAngles(const glm::vec4& quaternion, float& pitch, float& yaw, float& roll)
+{
+	float sinPitchCosYaw = 2.0f * (quaternion.w * quaternion.x + quaternion.y * quaternion.z);
+	float cosPitchCosYaw = 1.0f - 2.0f * (quaternion.x * quaternion.x + quaternion.y * quaternion.y);
+	pitch = glm::atan(sinPitchCosYaw, cosPitchCosYaw);
+
+	float sinYaw = 2.0f * (quaternion.w * quaternion.y - quaternion.z * quaternion.x);
+	yaw = (glm::abs(sinYaw) >= 1.0f) ? glm::sign(sinYaw) * glm::half_pi<float>() : glm::asin(sinYaw);
+
+	float sinRollCosYaw = 2.0f * (quaternion.w * quaternion.z + quaternion.x * quaternion.y);
+	float cosRollCosYaw = 1.0f - 2.0f * (quaternion.y * quaternion.y + quaternion.z * quaternion.z);
+	roll = glm::atan(sinRollCosYaw, cosRollCosYaw);
+
+	pitch = glm::degrees(pitch);
+	yaw = glm::degrees(yaw);
+	roll = glm::degrees(roll);
+}
+
+void Entity::ClampEulerRotation()
+{
+	if (v3rot.x < 0.0f || v3rot.x >= FULL_ROTATION)
+		v3rot.x = v3rot.x - (glm::floor(v3rot.x / FULL_ROTATION) * FULL_ROTATION);
+
+	if (v3rot.y < 0.0f || v3rot.y >= FULL_ROTATION)
+		v3rot.y = v3rot.y - (glm::floor(v3rot.y / FULL_ROTATION) * FULL_ROTATION);
+
+	if (v3rot.z < 0.0f || v3rot.z >= FULL_ROTATION)
+		v3rot.z = v3rot.z - (glm::floor(v3rot.z / FULL_ROTATION) * FULL_ROTATION);
+}

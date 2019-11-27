@@ -29,8 +29,8 @@ class Game : public Gamebase {
 	GameNode * snFirstChild;
 	GameNode * snSecondChild;
 
-	GameNode * scFirstChild;
-	GameNode * scSecondChild;
+	GameNode * rifle;
+	//GameNode * scSecondChild;
 
 	Camera * camera;
 public:
